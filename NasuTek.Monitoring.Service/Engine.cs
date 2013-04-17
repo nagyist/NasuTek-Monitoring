@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace NasuTek.Monitoring.Service
 {
-    class Engine
+    public class Engine
     {
         public Dictionary<string, NMonitor> Monitors { get; private set; }
 
@@ -28,6 +28,14 @@ namespace NasuTek.Monitoring.Service
                 var mntr = new NMonitor(monitor);
                 Monitors.Add(monitor.Attribute("name").Value, mntr);
                 mntr.Start();
+            }
+        }
+
+        public void Stop()
+        {
+            foreach (var monitor in Monitors)
+            {
+                monitor.Value.Stop();
             }
         }
     }

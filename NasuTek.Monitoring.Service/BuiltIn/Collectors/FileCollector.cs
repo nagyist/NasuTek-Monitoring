@@ -1,10 +1,11 @@
-﻿using System;
+﻿using NasuTek.Monitoring.Service.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace NasuTek.Monitoring.Service
+namespace NasuTek.Monitoring.Service.BuiltIn.Collectors
 {
     public class FileCollector : ICollector
     {

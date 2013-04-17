@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NasuTek.Monitoring.Service.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +23,7 @@ namespace NasuTek.Monitoring.Service
 
         public NMonitor(XElement element)
         {
-            Parameters = new Dictionary<string, string>();
+            Parameters = element.Elements("MonitorParam").GetParameterDictionary();
             Overrides = new Dictionary<string, Dictionary<string, string>>();
             Storage = new Dictionary<string, object>();
             Name = element.Attribute("name").Value;
@@ -30,10 +31,6 @@ namespace NasuTek.Monitoring.Service
             MonitorThread.Name = Name;
             TerminateThread = false;
             WaitTime = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(element.Attribute("time").Value));
-            foreach (XElement i in element.Elements("MonitorParam"))
-            {
-                Parameters.Add(i.Attribute("name").Value, i.Attribute("value").Value);
-            }
             MonitorObject = GetObject<IMonitor>(element.Attribute("type").Value);
             ElementObject = element;
         }
@@ -57,37 +54,25 @@ namespace NasuTek.Monitoring.Service
                     var repDict = new Dictionary<string, Dictionary<string, string>>();
                     foreach (XElement collector in ElementObject.Elements("Collector"))
                     {
-                        var paramDict = new Dictionary<string, string>();
-                        foreach (XElement param in collector.Elements("CollectorParam"))
-                        {
-                            paramDict.Add(param.Attribute("name").Value, param.Attribute("value").Value);
-                        }
+                        var paramDict = collector.Elements("CollectorParam").GetParameterDictionary();
+
                         ICollector collectorObject = GetObject<ICollector>(collector.Attribute("type").Value);
-                        var cdl = collectorObject.ExecuteCollector(paramDict, Overrides[collector.Attribute("type").Value]);
+                        var cdl = collectorObject.ExecuteCollector(paramDict, GetOverrides(collector.Attribute("type").Value));
 
                         foreach (XElement collectorFormatter in collector.Elements("CollectorFormatter"))
                         {
-                            var paramDictFmmtr = new Dictionary<string, string>();
-                            foreach (XElement param in collectorFormatter.Elements("CollectorFormatterParam"))
-                            {
-                                paramDictFmmtr.Add(param.Attribute("name").Value, param.Attribute("value").Value);
-                            }
+                            var paramDictFmmtr = collectorFormatter.Elements("CollectorFormatterParam").GetParameterDictionary();
+
                             ICollectorFormatter collectorFormatterObject = GetObject<ICollectorFormatter>(collectorFormatter.Attribute("type").Value);
-                            var retVal = collectorFormatterObject.FormatCollector(paramDictFmmtr, cdl, collectorFormatter);
+                            var retVal = collectorFormatterObject.FormatCollector(paramDictFmmtr, cdl, collectorFormatter, collectorObject.GetType());
                             repDict.Merge(retVal);
                         }
                     }
 
                     foreach (XElement reporter in ElementObject.Elements("Reporter"))
                     {
-                        var paramDict = new Dictionary<string, string>();
-                        foreach (XElement param in reporter.Elements("ReporterParam"))
-                        {
-                            paramDict.Add(param.Attribute("name").Value, param.Attribute("value").Value);
-                        }
-                        var format = reporter.Element("Format");
-                        if (format != null)
-                            paramDict.Add("Format", format.Value);
+                        var paramDict = reporter.Elements("ReporterParam").GetParameterDictionary();
+
                         IReporter collectorFormatterObject = GetObject<IReporter>(reporter.Attribute("type").Value);
                         collectorFormatterObject.ExecuteReport(paramDict, repDict);
                     }
@@ -96,10 +81,24 @@ namespace NasuTek.Monitoring.Service
             }
         }
 
+        private Dictionary<string, string> GetOverrides(string p)
+        {
+            if (Overrides.ContainsKey(p))
+                return Overrides[p];
+            else
+                return new Dictionary<string, string>();
+        }
+
         private T GetObject<T>(string p)
         {
             Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetType(p) != null);
             return (T)assembly.GetType(p).GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
+        }
+
+        public void CreateOverride(string overrideKey)
+        {
+            if (!Overrides.ContainsKey(overrideKey))
+                Overrides.Add(overrideKey, new Dictionary<string, string>());
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace NasuTek.Monitoring.Service
 {
@@ -21,6 +22,19 @@ namespace NasuTek.Monitoring.Service
         public static string CreateSubdomainName(this string domainName, string subdomainName)
         {
             return domainName + ":" + subdomainName;
+        }
+
+        public static Dictionary<string, string> GetParameterDictionary(this IEnumerable<XElement> enumerable)
+        {
+            var paramDict = new Dictionary<string, string>();
+            foreach (XElement param in enumerable)
+            {
+                if (param.Attribute("value") != null)
+                    paramDict.Add(param.Attribute("name").Value, param.Attribute("value").Value);
+                else
+                    paramDict.Add(param.Attribute("name").Value, param.Value);
+            }
+            return paramDict;
         }
 
         public static Dictionary<string, Dictionary<string, Dictionary<string, string>>> GetSubdomains(this Dictionary<string, Dictionary<string, string>> me)

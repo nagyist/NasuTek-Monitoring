@@ -1,10 +1,11 @@
-﻿using System;
+﻿using NasuTek.Monitoring.Service.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace NasuTek.Monitoring.Service
+namespace NasuTek.Monitoring.Service.BuiltIn.Monitors
 {
     public class OnNewFiles : IMonitor
     {
@@ -20,9 +21,9 @@ namespace NasuTek.Monitoring.Service
 
             fileList.AddRange(unexecuted);
             monitorClassObject.Storage["FilesRead"] = fileList;
-            if (!monitorClassObject.Overrides.ContainsKey("NasuTek.Monitoring.Service.FileCollector")) 
-                monitorClassObject.Overrides.Add("NasuTek.Monitoring.Service.FileCollector", new Dictionary<string, string>());
-            monitorClassObject.Overrides["NasuTek.Monitoring.Service.FileCollector"]["Files"] = String.Join(",", unexecuted);
+
+            monitorClassObject.CreateOverride("NasuTek.Monitoring.Service.BuiltIn.Collectors.FileCollector");
+            monitorClassObject.Overrides["NasuTek.Monitoring.Service.BuiltIn.Collectors.FileCollector"]["Files"] = String.Join(",", unexecuted);
             return true;
         }
     }
