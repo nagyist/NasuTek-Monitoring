@@ -1,4 +1,5 @@
 ﻿using NasuTek.Monitoring.Service.Interfaces;
+using NasuTek.Preprocessor.ProcessingLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,14 +19,14 @@ namespace NasuTek.Monitoring.Service
         protected bool TerminateThread { get; set; }
         protected TimeSpan WaitTime { get; private set; }
         protected XElement ElementObject { get; set; }
-        public Dictionary<string, object> Storage { get; private set; }
         public Dictionary<string, Dictionary<string, string>> Overrides { get; private set; }
+        public Processor Processor { get; private set; }
 
         public NMonitor(XElement element)
         {
+            Processor = new Preprocessor.ProcessingLibrary.Processor();
             Parameters = element.Elements("MonitorParam").GetParameterDictionary();
             Overrides = new Dictionary<string, Dictionary<string, string>>();
-            Storage = new Dictionary<string, object>();
             Name = element.Attribute("name").Value;
             MonitorThread = new Thread(new ParameterizedThreadStart(MonitorThreadCaller));
             MonitorThread.Name = Name;
@@ -51,7 +52,6 @@ namespace NasuTek.Monitoring.Service
             {
                 if (MonitorObject.TriggerMonitor(this))
                 {
-                    var repDict = new Dictionary<string, Dictionary<string, string>>();
                     foreach (XElement collector in ElementObject.Elements("Collector"))
                     {
                         var paramDict = collector.Elements("CollectorParam").GetParameterDictionary();
@@ -64,8 +64,7 @@ namespace NasuTek.Monitoring.Service
                             var paramDictFmmtr = collectorFormatter.Elements("CollectorFormatterParam").GetParameterDictionary();
 
                             ICollectorFormatter collectorFormatterObject = GetObject<ICollectorFormatter>(collectorFormatter.Attribute("type").Value);
-                            var retVal = collectorFormatterObject.FormatCollector(paramDictFmmtr, cdl, collectorFormatter, collectorObject.GetType());
-                            repDict.Merge(retVal);
+                            collectorFormatterObject.FormatCollector(paramDictFmmtr, cdl, collectorFormatter, collectorObject.GetType(), Processor);
                         }
                     }
 
@@ -74,7 +73,7 @@ namespace NasuTek.Monitoring.Service
                         var paramDict = reporter.Elements("ReporterParam").GetParameterDictionary();
 
                         IReporter collectorFormatterObject = GetObject<IReporter>(reporter.Attribute("type").Value);
-                        collectorFormatterObject.ExecuteReport(paramDict, repDict);
+                        collectorFormatterObject.ExecuteReport(paramDict, Processor);
                     }
                 }
                 Thread.Sleep(WaitTime);

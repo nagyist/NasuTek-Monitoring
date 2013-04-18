@@ -1,4 +1,5 @@
 ﻿using NasuTek.Monitoring.Service.Interfaces;
+using NasuTek.Preprocessor.ProcessingLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,9 @@ namespace NasuTek.Monitoring.Service.BuiltIn.Reporters
 {
     public class ConsoleReporter : IReporter
     {
-        public void ExecuteReport(Dictionary<string, string> parameters, Dictionary<string, Dictionary<string, string>> domains)
+        public void ExecuteReport(Dictionary<string, string> parameters, Processor processor)
         {
-            foreach (var domain in domains.GetSubdomains())
+            foreach (var domain in processor.GetAllDomains())
             {
                 Console.WriteLine("Domain: " + domain.Key);
 

@@ -1,0 +1,3 @@
+[submodule "NasuTek-Preprocessor"]
+	path = NasuTek-Preprocessor
+	url = git://github.com/NasuTek/NasuTek-Preprocessor.git

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NasuTek.Monitoring.Service", "NasuTek.Monitoring.Service\NasuTek.Monitoring.Service.csproj", "{22B64BC2-7D16-441F-81E2-62FECDA1D8BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NasuTek.Preprocessor.ProcessingLibrary", "NasuTek-Preprocessor\NasuTek.Preprocessor.ProcessingLibrary\NasuTek.Preprocessor.ProcessingLibrary.csproj", "{15C2869B-49A0-40A0-8C07-17F8C8D1521C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{22B64BC2-7D16-441F-81E2-62FECDA1D8BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22B64BC2-7D16-441F-81E2-62FECDA1D8BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22B64BC2-7D16-441F-81E2-62FECDA1D8BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15C2869B-49A0-40A0-8C07-17F8C8D1521C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15C2869B-49A0-40A0-8C07-17F8C8D1521C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15C2869B-49A0-40A0-8C07-17F8C8D1521C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15C2869B-49A0-40A0-8C07-17F8C8D1521C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

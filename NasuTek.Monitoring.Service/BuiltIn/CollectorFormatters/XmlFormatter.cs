@@ -1,4 +1,5 @@
 ﻿using NasuTek.Monitoring.Service.Interfaces;
+using NasuTek.Preprocessor.ProcessingLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +12,7 @@ namespace NasuTek.Monitoring.Service.BuiltIn.CollectorFormatters
 {
     public class XmlFormatter : ICollectorFormatter
     {
-        public Dictionary<string, Dictionary<string, string>> FormatCollector(Dictionary<string, string> parameters, Dictionary<string, string> collectorDict, System.Xml.Linq.XElement collectorElement, Type collectorType)
+        public void FormatCollector(Dictionary<string, string> parameters, Dictionary<string, string> collectorDict, System.Xml.Linq.XElement collectorElement, Type collectorType, Processor processor)
         {
             CollectorHelpers.IsCollectorFormatterValid(collectorType, "NasuTek.Monitoring.Service.BuiltIn.Collectors.FileCollector");
 
@@ -27,24 +28,16 @@ namespace NasuTek.Monitoring.Service.BuiltIn.CollectorFormatters
                             var xmlDoc = XDocument.Load(file);
                             foreach (var xmlRefVal in collectorElement.Elements("XmlRefToKeyValue"))
                             {
-                                CheckIfDomainExists(dictRet, xmlRefVal.Attribute("domain").Value.CreateSubdomainName(Path.GetFileName(file)));
+                                processor.AddDomain(xmlRefVal.Attribute("domain").Value, Path.GetFileName(file));
+
                                 XElement ele = xmlDoc.XPathSelectElement(xmlRefVal.Attribute("name").Value);
                                 if (ele != null)
-                                    dictRet[xmlRefVal.Attribute("domain").Value.CreateSubdomainName(Path.GetFileName(file))][xmlRefVal.Attribute("domain_key").Value] = ele.Value;
+                                    processor.GetDomain(xmlRefVal.Attribute("domain").Value, Path.GetFileName(file))[xmlRefVal.Attribute("domain_key").Value] = ele.Value;
                             }
                         }
-
-                        return dictRet;
                     }
-                default:
-                    return null;
+                    break;
             }
-        }
-
-        public void CheckIfDomainExists(Dictionary<string, Dictionary<string, string>> dict, string domain)
-        {
-            if (!dict.ContainsKey(domain))
-                dict.Add(domain, new Dictionary<string, string>());
-        }
+        }        
     }
 }

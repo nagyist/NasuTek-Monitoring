@@ -9,7 +9,7 @@ namespace NasuTek.Monitoring.Service.BuiltIn.Reporters
 {
     public class EmailReporter : IReporter
     {
-        public void ExecuteReport(Dictionary<string, string> parameters, Dictionary<string, Dictionary<string, string>> domains)
+        public void ExecuteReport(Dictionary<string, string> parameters, Preprocessor.ProcessingLibrary.Processor processor)
         {
             SmtpClient client = new SmtpClient();
             client.Port = Convert.ToInt32(parameters["port"]);
@@ -31,7 +31,5 @@ namespace NasuTek.Monitoring.Service.BuiltIn.Reporters
 
             client.Send(mm);
         }
-
-        private string FormatBody
     }
 }

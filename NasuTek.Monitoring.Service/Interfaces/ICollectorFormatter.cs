@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NasuTek.Preprocessor.ProcessingLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace NasuTek.Monitoring.Service.Interfaces
 {
     public interface ICollectorFormatter
     {
-        Dictionary<string, Dictionary<string, string>> FormatCollector(Dictionary<string, string> parameters, Dictionary<string, string> collectorDict, XElement collectorElement, Type collectorType);
+        void FormatCollector(Dictionary<string, string> parameters, Dictionary<string, string> collectorDict, XElement collectorElement, Type collectorType, Processor processor);
     }
 }
